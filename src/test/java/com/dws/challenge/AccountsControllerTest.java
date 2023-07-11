@@ -163,5 +163,25 @@ class AccountsControllerTest {
 
   }
 
+  @Test
+  void transferNegativeAmount() throws Exception {
+    String toAccountId = "Id20" + System.currentTimeMillis();
+    String fromAccountId = "Id21" + System.currentTimeMillis();
+
+
+    Account toAccount = new Account(toAccountId, new BigDecimal("40.45"));
+    Account fromAccount = new Account(fromAccountId, new BigDecimal("20.45"));
+
+    this.accountsService.createAccount(toAccount);
+    this.accountsService.createAccount(fromAccount);
+
+    Transaction transaction = new Transaction(fromAccountId,toAccountId,new BigDecimal("-25"));
+
+    this.mockMvc.perform(post("/v1/accounts/transfer",transaction).contentType(MediaType.APPLICATION_JSON)
+        .content(objectMapper.writeValueAsString(transaction)))
+        .andExpect(status().isBadRequest());
+
+  }
+
 
 }

@@ -82,8 +82,12 @@ class AccountsServiceTest {
     Account account3 = new Account(id3,new BigDecimal(100));
     this.accountsService.createAccount(account3);
 
+    String id4 = "Id14" + System.currentTimeMillis();
+    Account account4 = new Account(id4,new BigDecimal(100));
+    this.accountsService.createAccount(account4);
+
     Transaction transaction = new Transaction(id1,id2,new BigDecimal(20));
-    Transaction transaction2 = new Transaction(id2,id3,new BigDecimal(10));
+    Transaction transaction2 = new Transaction(id3,id4,new BigDecimal(10));
 
     Runnable runnable = () -> {
       for (int i= 0;i<5;i++) {
@@ -101,10 +105,15 @@ class AccountsServiceTest {
     new Thread(runnable2).start();
 
     try {
-      Thread.sleep(10000);
+      Thread.sleep(5000);
     } catch (InterruptedException e) {
       e.printStackTrace();
     }
+
+    assertThat(account.getBalance()).isEqualByComparingTo("0");
+    assertThat(account2.getBalance()).isEqualByComparingTo("200");
+    assertThat(account3.getBalance()).isEqualByComparingTo("50");
+    assertThat(account4.getBalance()).isEqualByComparingTo("150");
 
   }
 }
