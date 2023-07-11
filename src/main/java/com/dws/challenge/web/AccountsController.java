@@ -4,6 +4,7 @@ import com.dws.challenge.domain.Account;
 import com.dws.challenge.domain.Transaction;
 import com.dws.challenge.exception.DuplicateAccountIdException;
 import com.dws.challenge.exception.InsufficientFundsException;
+import com.dws.challenge.exception.ServerBusyException;
 import com.dws.challenge.service.AccountsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,6 +59,8 @@ public class AccountsController {
 
     try {
       this.accountsService.transferAmount(transaction);
+    } catch (ServerBusyException e) {
+      return new ResponseEntity<>(e.getMessage(), HttpStatus.SERVICE_UNAVAILABLE);
     } catch (InsufficientFundsException daie) {
       return new ResponseEntity<>(daie.getMessage(), HttpStatus.BAD_REQUEST);
     }
