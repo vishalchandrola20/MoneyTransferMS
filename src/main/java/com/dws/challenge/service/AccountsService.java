@@ -53,14 +53,14 @@ public class AccountsService {
     try {
       if (accountFrom.getLock().tryLock(3000, TimeUnit.MILLISECONDS)) {
         try {
-          if (accountTo.getLock().tryLock(3000, TimeUnit.MILLISECONDS)) {
-              this.accountsRepository.withdrawAmount(accountFrom,amount);
-              this.accountsRepository.depositAmount(accountTo,amount);
-              log.info("Successfully Transferred::"+Thread.currentThread().getName());
-              log.info("Account Id :: {} , updated balance:: {}", accountFrom.getAccountId(),accountFrom.getBalance());
-              log.info("Account Id :: {} , updated balance:: {}", accountTo.getAccountId(),accountTo.getBalance());
-          } else {
-            throw new ServerBusyException(Constants.SERVER_BUSY);
+            if (accountTo.getLock().tryLock(3000, TimeUnit.MILLISECONDS)) {
+                this.accountsRepository.withdrawAmount(accountFrom,amount);
+                this.accountsRepository.depositAmount(accountTo,amount);
+                log.info("Successfully Transferred::"+Thread.currentThread().getName());
+                log.info("Account Id :: {} , updated balance:: {}", accountFrom.getAccountId(),accountFrom.getBalance());
+                log.info("Account Id :: {} , updated balance:: {}", accountTo.getAccountId(),accountTo.getBalance());
+            } else {
+              throw new ServerBusyException(Constants.SERVER_BUSY);
           }
         } finally {
           accountTo.getLock().unlock();
@@ -70,7 +70,7 @@ public class AccountsService {
       }
     } catch (InterruptedException e) {
       log.error("Exception occurred",e);
-      throw new ServerBusyException(Constants.SERVER_BUSY);
+      throw new ServerBusyException(Constants.SERVER_BUSY,e);
     } finally {
       accountFrom.getLock().unlock();
     }
